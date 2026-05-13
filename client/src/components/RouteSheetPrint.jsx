@@ -1,32 +1,10 @@
 import QRCode from "qrcode";
 
-function formatMoney(value) {
-  return Number(value || 0).toLocaleString("uk-UA", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  });
-}
-
 function buildQrLink(order) {
   return `${window.location.origin}/route-sheet/${encodeURIComponent(order.orderNumber)}`;
 }
 
 function routeSheetHtml(order) {
-  const materialsRows = order.materials
-    .map(
-      (item) => `
-        <tr>
-          <td>${item.materialName}</td>
-          <td>${item.quantity}</td>
-          <td>${item.unitName}</td>
-          <td>${formatMoney(item.currency === "USD" ? Number(item.unitCost) * Number(item.usdRate) : item.unitCost)}</td>
-          <td>${formatMoney((item.currency === "USD" ? Number(item.unitCost) * Number(item.usdRate) : item.unitCost) * Number(item.quantity))}</td>
-          <td>${item.notes || ""}</td>
-        </tr>
-      `
-    )
-    .join("");
-
   return `
     <!doctype html>
     <html lang="uk">
@@ -38,9 +16,9 @@ function routeSheetHtml(order) {
           h1, h2, p { margin: 0 0 12px; }
           .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
           .card { border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-          th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
           .footer { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+          .otk { margin-top: 32px; padding-top: 18px; border-top: 1px solid #cbd5e1; }
+          .otk-line { margin-top: 28px; font-size: 16px; }
         </style>
       </head>
       <body>
@@ -48,9 +26,9 @@ function routeSheetHtml(order) {
         <p>Замовлення: <strong>${order.orderNumber}</strong></p>
 
         <div class="grid">
-          <div class="card"><strong>Диван:</strong><br/>${order.sofaName}</div>
-          <div class="card"><strong>Статус:</strong><br/>${order.status}</div>
-          <div class="card"><strong>Замовник:</strong><br/>${order.customerName}</div>
+          <div class="card"><strong>Назва:</strong><br/>${order.sofaName || "-"}</div>
+          <div class="card"><strong>Статус:</strong><br/>${order.status || "-"}</div>
+          <div class="card"><strong>Замовник:</strong><br/>${order.customerName || "-"}</div>
           <div class="card"><strong>Телефон:</strong><br/>${order.customerPhone || "-"}</div>
           <div class="card"><strong>Дата отримання:</strong><br/>${order.receivedDate || "-"}</div>
           <div class="card"><strong>Хто веде:</strong><br/>${order.assignedTo || "-"}</div>
@@ -59,23 +37,6 @@ function routeSheetHtml(order) {
           <div class="card"><strong>Обтяжка ПІБ:</strong><br/>${order.upholsteryName || "-"}</div>
         </div>
 
-        <h2>Матеріали</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Матеріал</th>
-              <th>Кількість</th>
-              <th>Од.</th>
-              <th>Ціна грн</th>
-              <th>Сума грн</th>
-              <th>Коментар</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${materialsRows || '<tr><td colspan="6">Матеріали не додані</td></tr>'}
-          </tbody>
-        </table>
-
         <h2 style="margin-top: 20px;">Примітки</h2>
         <p>${order.notes || "Без приміток"}</p>
 
@@ -83,6 +44,11 @@ function routeSheetHtml(order) {
           <div>Покрій: ____________________</div>
           <div>Пошив: ____________________</div>
           <div>Обтяжка: ____________________</div>
+        </div>
+
+        <div class="otk">
+          <strong>ОТК Максим Т. 0968533111</strong>
+          <div class="otk-line">Підпис: ________________________________</div>
         </div>
       </body>
     </html>

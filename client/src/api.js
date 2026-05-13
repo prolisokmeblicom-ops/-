@@ -1,4 +1,4 @@
-const API_URL = "https://srm-76xc.onrender.com/api";
+const API_URL = "https://one-uizn.onrender.com/api";
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, options);
